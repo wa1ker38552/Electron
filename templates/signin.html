@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Electron | Signin</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <link rel="stylesheet" href="/static/styles/global.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito Sans">
+    <script src="/static/scripts/script.js"></script>
+  </head>
+  <body class="centered-children">
+    <div class="modal-background centered-children" id="modal" style="display: none">
+      <div class="error"><div id="errorText">Unkown error occured!</div><span onclick="closeError()">X</span></div>
+      <div class="modal">
+        <div class="modal-title" id="modalTitle"></div>
+        <input class="modal-input" id="username" type="text" autocomplete="off" spellcheck="false" placeholder="Username">
+        <input class="modal-input" id="password" type="password" autocomplete="off" spellcheck="false" placeholder="Password">
+        <div class="modal-sub" onclick="togglePassword()" id="passwordToggle">Show password</div>
+        <button class="button" id="actionToggle">Login</button>
+        <button class="button cancel-button" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+    <div class="content-wrapper">
+      <button class="button" style="margin-right: 0.5em" onclick="openModal(0)">Login</button>
+      <button class="button" onclick="openModal(1)">Signup</button>
+    </div>
+  </body>
+</html>
