@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Electron | ...</title>
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <link rel="stylesheet" href="/static/styles/app.css">
+    <link rel="stylesheet" href="/static/styles/chat.css">
+    <link rel="stylesheet" href="/static/styles/global.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito Sans">
+    <script src="/static/scripts/create.js"></script>
+    <script src="/static/scripts/loader.js"></script>
+    <script src="/static/scripts/share.js"></script>
+    <script src="/static/scripts/chatEvents.js"></script>
+  </head>
+  <body>
+    <script>
+      var modal, error, errorText, shareModal, shareLink, shareButton, leaveChatButton, leaveModal
+      var id = "{{id}}"
+      window.onload = function() {
+        modal = document.getElementById("modal")
+        error = document.getElementsByClassName("error")[0]
+        errorText = document.getElementById("errorText")
+        shareModal = document.getElementById("shareModal")
+        shareLink = document.getElementById("shareLink")
+        shareButton = document.getElementById("shareButton")
+        leaveChatButton = document.getElementById("leaveChatButton")
+        leaveModal = document.getElementById("leaveModal")
+        
+        shareLink.innerHTML = window.location.origin+"/invite/"+id
+
+        fetchUserChats()
+          .then(data => renderUserChats(data, id))
+
+        fetchChatMeta(id)
+          .then(data => {
+            document.title = 'Electric | '+data.name
+            document.getElementById("chatHeader").innerHTML = data.name
+            document.getElementById("input").placeholder = "Message "+data.name
+            if (getCookie("Authorization").split(".")[0] == data.owner) {
+              var button = document.createElement("button")
+              button.className = "button selection-button chat-option"
+              button.innerHTML = "⚙️"
+              document.getElementsByClassName("chat-options-container")[0].append(button)
+              leaveChatButton.onclick = function() {openLeaveModal()}
+            } else {
+              leaveChatButton.onclick = function() {leaveChat(id)}
+            }
+
+            var avatar = document.createElement("div")
+            var avatarIcon = document.createElement("img")
+            var username = document.createElement("span")
+            avatar.className = "panel-author-avatar"
+
+            var members = [data.owner]
+            members.push(...data.members)
+            fetchUserAvatars(members)
+              .then(avatars => avatars.json())
+              .then(avatars => {
+                if (avatars.data[0]) {
+                  avatarIcon.src = avatars.data[0]
+                } else {
+                  avatarIcon.src = "/static/assets/default.png"
+                }
+                avatars.data.shift()
+                renderChatMembers(data.members, avatars.data)
+              })
+            
+            username.innerHTML = data.owner
+            avatar.append(avatarIcon)
+            document.getElementById("chatOwner").append(avatar, username)
+          })
+      }
+    </script>
+    <div class="modal-background centered-children" id="modal" style="display: none">
+      <div class="error"><div id="errorText">Unkown error occured!</div><span onclick="closeError()">X</span></div>
+      <div class="modal">
+        <div class="modal-title" id="modalTitle">✨ Create</div>
+        <input class="modal-input" id="name" type="text" autocomplete="off" spellcheck="false" placeholder="Name">
+        <button class="button" onclick="createChat()">Create</button>
+        <button class="button cancel-button" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+    <div class="modal-background centered-children" id="shareModal" style="display: none">
+      <div class="modal">
+        <div class="modal-title" id="modalTitle">🔗 Share</div>
+        <div class="share-link" id="shareLink"></div>
+        <button class="button" onclick="copyLink()" id="shareButton">Copy</button>
+        <button class="button cancel-button" onclick="closeShareModal()">Cancel</button>
+      </div>
+    </div>
+    <div class="modal-background centered-children" id="leaveModal" style="display: none">
+      <div class="modal">
+        <div class="modal-title" id="modalTitle">If you leave, the chat will be <span style="color: var(--warning)">deleted!</span></div>
+        <button class="button warning" onclick="leaveChat('{{id}}')">Leave</button>
+        <button class="button cancel-button" onclick="closeLeaveModal()">Cancel</button>
+      </div>
+    </div>
+    <div class="app">
+      <div class="tabs-wrapper">
+        <div class="tabs-container"></div>
+        <div class="selection-container centered-children">
+          <button class="button selection-button" onclick="window.location.href='/'">🏠</button>
+          <button class="button selection-button" onclick="openCreateModal()">✨</button>
+          <button class="button selection-button" onclick="window.location.href='/settings'">⚙️</button>
+          <button class="button selection-button" onclick="window.location.href='/logout'">🔐</button>
+        </div>
+      </div>
+      <div class="content-wrapper">
+        <div class="content-container">
+          <div class="chat-header centered-vertically">
+            <span id="chatHeader">...</span>
+            <div class="chat-options-container">
+              <button class="button selection-button chat-option" onclick="showShareModal()">🔗</button>
+              <button class="button selection-button chat-option" id="leaveChatButton">🔐</button>
+            </div>
+          </div>
+          <div class="chat-content"></div>
+          <div class="chat-input-container">
+            <input class="chat-input" type="text" id="input" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+        <div class="content-panel" id="contentPanelMembers">
+          <div class="content-panel-sub">Owner</div>
+          <div class="content-panel-user centered-vertically" id="chatOwner"></div>
+          <br>
+          <div class="content-panel-sub">Members</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
