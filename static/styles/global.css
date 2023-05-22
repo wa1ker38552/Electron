@@ -1,0 +1,19 @@
+:root {
+  --accent: #6c89fe;
+  --accent-dark: #4d70ff;
+  --accent-border: #4f65bf;
+  --accent-light: #d6deff;
+  
+  --border: #ababab;
+  --light-secondary: #ededed;
+  --dark-secondary: #dedede;
+  
+  --text-light: #4f4f4f;
+  --text-dark: #3d3d3d;
+
+  --success: #94ffa0;
+  --success-dark: #68ac70;
+
+  --warning: #fe6767;
+  --warning-dark: #fe2f2f;
+}
