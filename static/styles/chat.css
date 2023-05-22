@@ -1,0 +1,102 @@
+.content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.content-panel {
+  width: 13em;
+  padding: 0.5em;
+  box-sizing: border-box;
+  background: var(--dark-secondary);
+  border-style: none none none solid;
+  border-color: var(--border);
+}
+
+.content-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.chat-header {
+  position: relative;
+  background: var(--dark-secondary);
+  font-size: 1.5em;
+  padding: 0.5em;
+  box-sizing: border-box;
+  box-shadow: var(--border) 0 0 0.5em;
+  color: var(--text-dark);
+  user-select: text;
+}
+
+.chat-input-container {
+  padding: 0.5em;
+  box-sizing: border-box;
+}
+
+.chat-input {
+  width: 100%;
+  font-size: 1em;
+  color: var(--text-dark);
+  padding: 0.35em;
+  box-sizing: border-box;
+  border-radius: 4px;
+  outline: 0;
+  border-style: none;
+  background: var(--dark-secondary);
+  font-family: "Nunito Sans";
+}
+
+.content-panel-sub {
+  font-size: 1.5em;
+  color: var(--text-dark);
+}
+
+.content-panel-user {
+  font-size: 1.3em;
+  color: var(--text-light);
+}
+
+.panel-author-avatar {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  overflow: hidden;
+  border-radius: 50%;
+  margin-right: 0.5em;
+}
+
+.chat-options-container {
+  display: inline-block;
+  position: absolute;
+  right: 0.5em;
+}
+
+.chat-option {
+  font-size: 0.7em;
+}
+
+.share-link {
+  width: 100%;
+  padding: 0.2em;
+  font-size: 1em;
+  border-style: solid;
+  border-color: var(--border);
+  color: var(--text-dark);
+  border-width: 2px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  overflow-x: auto;
+  user-select: text;
+  margin-bottom: 0.5em;
+}
+
+.success {
+  background: var(--success);
+  border-color: var(--success-dark);
+  color: var(--text-dark);
+}
+
+.warning {
+  background: var(--warning);
+  border-color: var(--warning-dark);
+}
