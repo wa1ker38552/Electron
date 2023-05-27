@@ -1,3 +1,4 @@
+from subscription_manager import Subscription
 from flask import render_template
 from flask import make_response
 from database import Database
@@ -11,6 +12,7 @@ import time
 app = Flask(__name__)
 db = Database(path="db.json")
 alpha = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
+stream = Subscription(db)
 
 def load_json(data):
   return json.loads(data.decode('utf-8'))
@@ -27,7 +29,13 @@ def app_chatroom(id):
   if auth:
     if id in db.load()['chats']:
       chat = db.load()['chats'][id]
-      if auth.split('.')[0] in chat['members'] or auth.split('.')[0] == chat['owner']:
+      username = auth.split('.')[0]
+      if username in chat['members'] or username == chat['owner']:
+        if stream.is_subscribed(username):
+          stream.unsubscribe(username)
+          stream.subscribe(username, id)
+        else:
+          stream.subscribe(username, id)
         return render_template('chatroom.html', id=id)
   return redirect('/', code=302)
 
@@ -79,6 +87,39 @@ def api_chat_details(id):
   else:
     return {'success': False, 'message': 'Invalid chatroom ID'}
 
+@app.route('/chats/<id>/message', methods=['POST'])
+def api_chat_message(id):
+  chat_data = db.load()['chats']
+  if id in chat_data:
+    username = request.cookies.get('Authorization').split('.')[0]
+    message = {
+      'author': username,
+      'content': load_json(request.data)['content']
+    }
+    chat_data[id]['history'].append(message)
+    db.set('chats', chat_data)
+    stream.dispatch(id, message)
+    return {'success': True, 'data': message}
+  return {'success': False, 'message': 'Invalid chat ID'}
+
+@app.route('/chats/<id>/history')
+def api_chat_history(id):
+  chat_data = db.load()['chats']
+  if id in chat_data:
+    account_data = db.load()['accounts']
+    if request.args.get('cursor'):
+      pass
+    else:
+      messages = chat_data[id]['history'][-50:]
+      
+    for i, message in enumerate(messages):
+      messages[i]['author'] = {
+        'username': message['author'],
+        'avatar': account_data[message['author']]['avatar']
+      }
+    return {'success': True, 'data': messages}
+  return {'success': False, 'message': 'Invalid chat ID'}
+
 @app.route('/logout')
 def api_logout():
   response = make_response(redirect('/', code=302))
@@ -123,7 +164,7 @@ def api_signup():
         account_data[data['username']] = {
           'password': data['password'],
           'avatar': None,
-          'join': time.time(),
+          'joined': time.time(),
           'chats': []
         }
         
@@ -182,10 +223,21 @@ def api_userchats(username):
 def api_avatars_batch():
   data = load_json(request.data)
   account_data = db.load()['accounts']
-  avatars = {'data': []}
+  avatars = {'data': {}}
   for member in data['members']:
-    avatars['data'].append(account_data[member]['avatar'])
+    avatars['data'][member] = account_data[member]['avatar']
   return avatars
+
+@app.route('/stream/<id>')
+def api_stream(id):
+  username = request.cookies.get('Authorization').split('.')[0]
+  if stream.is_subscribed(username):
+    queue = stream.get_stream(username)
+    stream.ack(username)
+    return {'data': queue}
+  else:
+    stream.subscribe(username, id)
+    return {'data': []}
   
 
 app.run(host='0.0.0.0', port=8080)
