@@ -100,3 +100,8 @@
   background: var(--warning);
   border-color: var(--warning-dark);
 }
+
+.chat-content {
+  padding: 0.5em;
+  box-sizing: border-box;
+}
