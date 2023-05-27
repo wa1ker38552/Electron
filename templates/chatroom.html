@@ -6,70 +6,18 @@
     <link rel="stylesheet" href="/static/styles/app.css">
     <link rel="stylesheet" href="/static/styles/chat.css">
     <link rel="stylesheet" href="/static/styles/global.css">
+    <link rel="stylesheet" href="/static/styles/message.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito Sans">
     <script src="/static/scripts/create.js"></script>
     <script src="/static/scripts/loader.js"></script>
     <script src="/static/scripts/share.js"></script>
     <script src="/static/scripts/chatEvents.js"></script>
+    <script src="/static/scripts/chatSetup.js"></script>
   </head>
   <body>
     <script>
-      var modal, error, errorText, shareModal, shareLink, shareButton, leaveChatButton, leaveModal
+      var modal, error, errorText, shareModal, shareLink, shareButton, leaveChatButton, leaveModal, input
       var id = "{{id}}"
-      window.onload = function() {
-        modal = document.getElementById("modal")
-        error = document.getElementsByClassName("error")[0]
-        errorText = document.getElementById("errorText")
-        shareModal = document.getElementById("shareModal")
-        shareLink = document.getElementById("shareLink")
-        shareButton = document.getElementById("shareButton")
-        leaveChatButton = document.getElementById("leaveChatButton")
-        leaveModal = document.getElementById("leaveModal")
-        
-        shareLink.innerHTML = window.location.origin+"/invite/"+id
-
-        fetchUserChats()
-          .then(data => renderUserChats(data, id))
-
-        fetchChatMeta(id)
-          .then(data => {
-            document.title = 'Electric | '+data.name
-            document.getElementById("chatHeader").innerHTML = data.name
-            document.getElementById("input").placeholder = "Message "+data.name
-            if (getCookie("Authorization").split(".")[0] == data.owner) {
-              var button = document.createElement("button")
-              button.className = "button selection-button chat-option"
-              button.innerHTML = "⚙️"
-              document.getElementsByClassName("chat-options-container")[0].append(button)
-              leaveChatButton.onclick = function() {openLeaveModal()}
-            } else {
-              leaveChatButton.onclick = function() {leaveChat(id)}
-            }
-
-            var avatar = document.createElement("div")
-            var avatarIcon = document.createElement("img")
-            var username = document.createElement("span")
-            avatar.className = "panel-author-avatar"
-
-            var members = [data.owner]
-            members.push(...data.members)
-            fetchUserAvatars(members)
-              .then(avatars => avatars.json())
-              .then(avatars => {
-                if (avatars.data[0]) {
-                  avatarIcon.src = avatars.data[0]
-                } else {
-                  avatarIcon.src = "/static/assets/default.png"
-                }
-                avatars.data.shift()
-                renderChatMembers(data.members, avatars.data)
-              })
-            
-            username.innerHTML = data.owner
-            avatar.append(avatarIcon)
-            document.getElementById("chatOwner").append(avatar, username)
-          })
-      }
     </script>
     <div class="modal-background centered-children" id="modal" style="display: none">
       <div class="error"><div id="errorText">Unkown error occured!</div><span onclick="closeError()">X</span></div>
